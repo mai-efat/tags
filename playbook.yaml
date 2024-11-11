@@ -1,0 +1,32 @@
+---
+- name: Configure Nginx on Web Server
+  hosts: my_hosts  # Ensure this matches your inventory group
+  vars:
+    my_msg: hello_nti  # Define a variable that can be used in tasks
+
+  tasks:
+    - name: Update apt cache (Debian/Ubuntu)
+      apt:
+        update_cache: yes
+
+    - name: Install latest Nginx
+      apt:
+        name: nginx
+        state: latest  # Ensures the latest version is installed
+
+    - name: Install Nginx package if it's not installed
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Write hostname using Jinja2 template
+      template:
+        src: ./index_html.j2  # Ensure this path is correct
+        dest: /var/www/html/index.html
+
+    - name: Ensure Nginx service is started and enabled
+      sysvinit:
+        name: nginx  # The name of the service (e.g., nginx)
+        state: restarted  # Restart the service
+        enabled: yes  # Ensure it starts on boot
